@@ -9,6 +9,7 @@ namespace PasswordHandler
     using System.DirectoryServices;
     using System.Drawing;
     using System.Linq;
+    using System.Runtime.ConstrainedExecution;
     using System.Text;
     using System.Threading.Tasks;
     using System.Windows.Forms;
@@ -20,28 +21,30 @@ namespace PasswordHandler
         {
             InitializeComponent();
         }
-        static string connection = ("host=localhost;port=3306;database=db_passhandler;uid=root;password=admin");
+
+        static string connection = "host=localhost;port=3306;database=db_passhandler;uid=root;password=admin";
         MySqlConnection conn = new MySqlConnection(connection);
 
         void FillTable()
         {
-            string v_query = "SELECT * FROM tbl_passhandler";
-            try
-            {
+            
+            try {
                 conn.Open();
-                using (MySqlDataAdapter v_adapter = new MySqlDataAdapter(v_query, conn))
-                {
-                    DataTable v_dt = new DataTable();
-                    v_adapter.Fill(v_dt);
+                string queries = "SELECT * FROM tbl_passhandler";
+                using (MySqlDataAdapter v_adapter = new MySqlDataAdapter(queries, conn)) {
 
-                    dataGridView1.DataSource = v_dt;
+                    DataTable dt = new DataTable();
+                    v_adapter.Fill(dt);
+
+                    dataGridView1.DataSource = dt;
+
+                    MessageBox.Show("Data Connected");
+                    conn.Close();
                 }
-                MessageBox.Show("Data Fetched");
-                conn.Close();
+
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Data can not be Fetched");
+            catch (Exception ex) {
+                MessageBox.Show("Data can't connect");
                 conn.Close();
             }
         }
@@ -59,100 +62,96 @@ namespace PasswordHandler
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            //Fetching data from table or query data from table
-            string id = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();
-
-            try
-            {
+            string ID = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();
+            conn.Open();
+            try {
+               
                 UsernameUpdateTxt.Text = "";
                 EmailUpdateTxt.Text = "";
                 PasswordUpdateTxt.Text = "";
                 DateUpdateTxt.Text = "";
-                VerifiedYRb.Checked = false;
                 VerifiedNRb.Checked = false;
+                VerifiedYRb.Checked = false;
                 AccountUpdateTxt.Text = "";
-                string v_query = "SELECT * FROM tbl_passhandler WHERE UID = " + id;
-                conn.Open();
-                using (MySqlDataAdapter v_adapter = new MySqlDataAdapter(v_query, conn))
-                {
 
-                    DataTable v_dt = new DataTable();
-                    v_adapter.Fill(v_dt);
+                string queries = "SELECT * FROM tbl_passhandler WHERE UID = " + ID;
+                using (MySqlDataAdapter v_adapter = new MySqlDataAdapter(queries, conn)) {
 
-                    string username = v_dt.Rows[0].ItemArray[1].ToString();
-                    UsernameUpdateTxt.Text = username;
-                    UsernameUpdateTxt.Text = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();
+                    DataTable dt = new DataTable();
+                    v_adapter.Fill(dt);
+
+                    
+                    UsernameUpdateTxt.Text = dt.Rows[0].ItemArray[1].ToString();
+                    string name = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[1].Value.ToString();
 
 
-                    string email = v_dt.Rows[0].ItemArray[2].ToString();
-                    EmailUpdateTxt.Text = email;
-                    EmailUpdateTxt.Text = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
+                   
+                    EmailUpdateTxt.Text = dt.Rows[0].ItemArray[2].ToString();
+                    string email = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[2].Value.ToString();
 
-                    string password = v_dt.Rows[0].ItemArray[3].ToString();
-                    PasswordUpdateTxt.Text = password;
-                    PasswordUpdateTxt.Text = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString();
+
+                   
+                    PasswordUpdateTxt.Text = dt.Rows[0].ItemArray[3].ToString();
+                    string pass = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[3].Value.ToString();
+
 
                     DateTime date;
                     try
                     {
-                        if (DateTime.TryParse(v_dt.Rows[0].ItemArray[4].ToString(), out date))
+                       
+                        if (DateTime.TryParse(dt.Rows[0].ItemArray[4].ToString(), out date))
                         {
 
-                            DateUpdateTxt.Text = date.Date.ToString();
-
-
+                            DateUpdateTxt.Text = date.ToString();
+                            MessageBox.Show("Date Fetched");
                         }
-                        else
-                        {
-                            MessageBox.Show("Date Invalid");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Date unable to Fetch");
-                    }
 
+                    }
+                    catch (Exception ex) {
+                        MessageBox.Show("Date can't Fetched");
+                    }
+                  
+                   
 
                     Byte verified;
-
                     try
                     {
-                        if (Byte.TryParse(v_dt.Rows[0].ItemArray[5].ToString(), out verified))
+                        if (Byte.TryParse(dt.Rows[0].ItemArray[5].ToString(), out verified))
                         {
 
                             if (verified == 1)
                             {
+
                                 VerifiedYRb.Checked = true;
-                                VerifiedYRb.Checked = Convert.ToBoolean(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value);
+
                             }
                             else
                             {
                                 VerifiedNRb.Checked = true;
-                                VerifiedNRb.Checked = Convert.ToBoolean(dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[5].Value);
                             }
+
+                            MessageBox.Show("Verifying Account Success");
                         }
+
+
                     }
-                    catch (Exception ex)
-                    {
-
-                        MessageBox.Show("Verified Invalid");
+                    catch (Exception ex) {
+                        MessageBox.Show("Verifying Account Unsuccess");
                     }
+                   
+                    string accnt = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[6].Value.ToString();
+                    AccountUpdateTxt.Text = dt.Rows[0].ItemArray[6].ToString();
 
-                    string account = v_dt.Rows[0].ItemArray[6].ToString();
-                    AccountUpdateTxt.Text = account;
-                    AccountUpdateTxt.Text = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[6].Value.ToString();
-
-
-
+                    MessageBox.Show("Successful fetching data");
+                    conn.Close();
                 }
 
+            }
+            catch (Exception ex) {
+                MessageBox.Show("Unsuccessful fetching data");
                 conn.Close();
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error Fetching data");
-                conn.Close();
-            }
+            FillTable();
 
         }
 
@@ -173,57 +172,68 @@ namespace PasswordHandler
 
         }
 
+        Byte getverified() {
+
+            Byte ver = 0;
+            if (VerifiedYRb.Checked == true)
+            {
+                ver = 1;
+            }
+            else {
+                ver = 0;
+            }
+
+
+            return ver;
+        
+        }
+
         private void SaveUpdateBtn_Click(object sender, EventArgs e)
         {
-
+            
             string ID = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();
 
+            string name = UsernameUpdateTxt.Text;
+            string email = EmailUpdateTxt.Text;
+            string password = PasswordUpdateTxt.Text;
+            DateTime date = DateTime.Now;
+            Byte verified;
+            if (VerifiedYRb.Checked == true)
+            {
+                verified = 1;
+            }
+            else
+            {
+                verified = 0;
+            }
+            string account = AccountUpdateTxt.Text; 
             try
             {
                 conn.Open();
-                string name = UsernameUpdateTxt.Text;
-                string email = EmailUpdateTxt.Text;
-                string password = PasswordUpdateTxt.Text;
-                DateTime date = DateTime.Now;
-                Byte verified = 0;
-                if (VerifiedYRb.Checked == true)
-                {
-                    verified = 1;
-                }
-                else
-                {
-                    verified = 0;
-                }
+                string queries = "UPDATE tbl_passhandler SET U_name = @u_name, U_email = @u_email, U_pass = @u_pass, U_date = @u_date, U_verified = @u_verified, U_accnt = @u_accnt WHERE UID = @uid";
+                using (MySqlCommand cmd = new MySqlCommand(queries, conn)) {
 
-                string account = AccountUpdateTxt.Text;
-                string v_query = "UPDATE tbl_passhandler SET U_name = @u_name, U_email = @u_email, U_pass = @u_pass,U_date = @u_date, U_verified = @u_verified, U_accnt = @u_accnt  WHERE UID = @uid";
-
-
-                using (MySqlCommand cmd = new MySqlCommand(v_query, conn))
-                {
 
                     cmd.Parameters.AddWithValue("@u_name", name);
                     cmd.Parameters.AddWithValue("@u_email", email);
                     cmd.Parameters.AddWithValue("@u_pass", password);
                     cmd.Parameters.AddWithValue("@u_date", date);
-                    cmd.Parameters.AddWithValue("@u_verified", Convert.ToByte(verified));
-                    cmd.Parameters.AddWithValue("@u_accnt", account);
+                    cmd.Parameters.AddWithValue("@u_verified", verified);
+                    cmd.Parameters.AddWithValue("@u_accnt",account);
                     cmd.Parameters.AddWithValue("@uid", Convert.ToInt32(ID));
 
-
                     cmd.ExecuteNonQuery();
-                    MessageBox.Show("Data Updated");
+                    MessageBox.Show("Update Successfully");
                     conn.Close();
-
                 }
-                FillTable();
 
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Data NULLS");
+            catch (Exception ex) {
+                MessageBox.Show("Update Unsuccessfully");
                 conn.Close();
             }
+            FillTable();
+
         }
 
         private void VerifiedYRb_CheckedChanged(object sender, EventArgs e)
@@ -238,27 +248,25 @@ namespace PasswordHandler
 
         private void deletebtn_Click(object sender, EventArgs e)
         {
-           
-
             string ID = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[0].Value.ToString();
-            try{
+            try
+            {
                 conn.Open();
-                string v_query = "DELETE FROM tbl_passhandler WHERE UID = @ID";
-                using (MySqlCommand cmd = new MySqlCommand(v_query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@ID", Convert.ToInt32(ID));
-                    cmd.ExecuteNonQuery();
-                    conn.Close();
+                string queries = "DELETE FROM tbl_passhandler WHERE UID = @uid";
+                using (MySqlCommand cmd = new MySqlCommand(queries,conn)){
 
+                    cmd.Parameters.AddWithValue("@uid", ID);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Data Deleted");
+                    conn.Close();
                 }
-                MessageBox.Show("Delete Successfully");
-                FillTable();
             }
             catch (Exception ex) {
-                MessageBox.Show("Delete UnSuccessfully");
+
+                MessageBox.Show("Data can't Delete");
                 conn.Close();
             }
-            
+            FillTable();
         }
     }
 

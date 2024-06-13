@@ -66,7 +66,7 @@
             dataGridView1.MultiSelect = false;
             dataGridView1.Name = "dataGridView1";
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView1.Size = new Size(522, 445);
+            dataGridView1.Size = new Size(701, 445);
             dataGridView1.TabIndex = 0;
             dataGridView1.CellClick += dataGridView1_CellClick;
             dataGridView1.CellContentClick += dataGridView1_CellContentClick;
@@ -75,10 +75,10 @@
             // 
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
-            tabControl1.Location = new Point(549, 12);
+            tabControl1.Location = new Point(742, 12);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(229, 445);
+            tabControl1.Size = new Size(231, 445);
             tabControl1.TabIndex = 2;
             // 
             // tabPage1
@@ -98,7 +98,7 @@
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(221, 417);
+            tabPage1.Size = new Size(223, 417);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Update";
             tabPage1.UseVisualStyleBackColor = true;
@@ -235,7 +235,7 @@
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(221, 417);
+            tabPage2.Size = new Size(170, 417);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Delete";
             tabPage2.UseVisualStyleBackColor = true;
@@ -254,7 +254,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 487);
+            ClientSize = new Size(1016, 487);
             Controls.Add(tabControl1);
             Controls.Add(dataGridView1);
             Name = "DataForm";
